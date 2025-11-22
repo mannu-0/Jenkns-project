@@ -2,55 +2,139 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Mini Click Game</title>
+<title>Mini Flappy Bird</title>
+
 <style>
     body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background: #111;
-        color: white;
+        margin: 0;
+        background: skyblue;
+        overflow: hidden;
         font-family: Arial;
-        flex-direction: column;
     }
 
-    #circle {
-        width: 80px;
-        height: 80px;
-        background: #ff4d4d;
+    #game {
+        width: 400px;
+        height: 500px;
+        background: #70c5ce;
+        margin: 20px auto;
+        position: relative;
+        overflow: hidden;
+        border: 3px solid #000;
+        border-radius: 10px;
+    }
+
+    #bird {
+        width: 30px;
+        height: 30px;
+        background: yellow;
         border-radius: 50%;
-        cursor: pointer;
-        transition: 0.2s;
+        position: absolute;
+        left: 50px;
+        top: 200px;
     }
 
-    #circle:hover {
-        transform: scale(1.2);
-        background: #ff1a1a;
+    .pipe {
+        width: 50px;
+        background: green;
+        position: absolute;
+        right: 0;
     }
 
     #score {
-        margin-top: 20px;
-        font-size: 24px;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 22px;
+        font-weight: bold;
     }
 </style>
 </head>
 <body>
 
-<div id="circle"></div>
 <div id="score">Score: 0</div>
 
+<div id="game">
+    <div id="bird"></div>
+</div>
+
 <script>
+    let bird = document.getElementById("bird");
+    let game = document.getElementById("game");
+    let scoreDisplay = document.getElementById("score");
+
+    let birdTop = 200;
+    let gravity = 2;
     let score = 0;
 
-    document.getElementById("circle").onclick = function () {
-        score++;
-        document.getElementById("score").innerText = "Score: " + score;
+    function jump() {
+        birdTop -= 40; // jump height
+    }
 
-        // Random move
-        this.style.marginTop = (Math.random() * 200) + "px";
-        this.style.marginLeft = (Math.random() * 200) + "px";
-    };
+    document.body.onclick = jump; // Click to jump
+
+    function createPipes() {
+        let pipeTop = document.createElement("div");
+        let pipeBottom = document.createElement("div");
+
+        let gap = 120; // gap between pipes
+        let topHeight = Math.floor(Math.random() * 250) + 50;
+        let bottomHeight = 500 - topHeight - gap;
+
+        pipeTop.classList.add("pipe");
+        pipeBottom.classList.add("pipe");
+
+        pipeTop.style.height = topHeight + "px";
+        pipeBottom.style.height = bottomHeight + "px";
+
+        pipeTop.style.top = "0px";
+        pipeBottom.style.bottom = "0px";
+
+        pipeTop.style.right = "0px";
+        pipeBottom.style.right = "0px";
+
+        game.appendChild(pipeTop);
+        game.appendChild(pipeBottom);
+
+        let move = setInterval(() => {
+            let pipeLeft = parseInt(pipeTop.style.right);
+
+            if (pipeLeft > 400) {
+                clearInterval(move);
+                pipeTop.remove();
+                pipeBottom.remove();
+            }
+
+            pipeTop.style.right = pipeLeft + 2 + "px";
+            pipeBottom.style.right = pipeLeft + 2 + "px";
+
+            // collision detection
+            if (pipeLeft > 340 && pipeLeft < 400) {
+                if (birdTop < topHeight || birdTop + 30 > topHeight + gap) {
+                    alert("Game Over! Score: " + score);
+                    location.reload();
+                }
+            }
+
+            // score add
+            if (pipeLeft === 398) {
+                score++;
+                scoreDisplay.innerText = "Score: " + score;
+            }
+
+        }, 10);
+    }
+
+    setInterval(createPipes, 2000);
+
+    // Bird fall loop
+    setInterval(() => {
+        birdTop += gravity;
+        bird.style.top = birdTop + "px";
+
+        if (birdTop >= 470 || birdTop <= 0) {
+            alert("Game Over! Score: " + score);
+            location.reload();
+        }
+    }, 20);
 </script>
 
 </body>
