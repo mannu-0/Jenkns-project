@@ -2,139 +2,126 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Mini Flappy Bird</title>
+<title>Car Driving Mini Game</title>
 
 <style>
     body {
         margin: 0;
-        background: skyblue;
+        background: #222;
         overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
         font-family: Arial;
     }
 
     #game {
-        width: 400px;
+        width: 300px;
         height: 500px;
-        background: #70c5ce;
-        margin: 20px auto;
+        background: #555;
         position: relative;
         overflow: hidden;
-        border: 3px solid #000;
         border-radius: 10px;
+        border: 3px solid white;
     }
 
-    #bird {
-        width: 30px;
-        height: 30px;
-        background: yellow;
-        border-radius: 50%;
+    .line {
+        width: 10px;
+        height: 80px;
+        background: white;
         position: absolute;
-        left: 50px;
-        top: 200px;
+        left: 145px;
+        animation: moveLines 1s linear infinite;
     }
 
-    .pipe {
+    @keyframes moveLines {
+        from { top: -100px; }
+        to { top: 500px; }
+    }
+
+    #car {
         width: 50px;
-        background: green;
+        height: 80px;
+        background: red;
         position: absolute;
-        right: 0;
+        bottom: 20px;
+        left: 125px;
+        border-radius: 5px;
     }
 
-    #score {
-        text-align: center;
-        margin-top: 10px;
-        font-size: 22px;
-        font-weight: bold;
+    .enemy {
+        width: 50px;
+        height: 80px;
+        background: yellow;
+        position: absolute;
+        top: -100px;
+        border-radius: 5px;
+        animation: moveEnemy 2s linear infinite;
+    }
+
+    @keyframes moveEnemy {
+        from { top: -100px; }
+        to { top: 600px; }
     }
 </style>
 </head>
 <body>
 
-<div id="score">Score: 0</div>
-
 <div id="game">
-    <div id="bird"></div>
+    <div class="line" style="top:0"></div>
+    <div class="line" style="top:150px"></div>
+    <div class="line" style="top:300px"></div>
+    <div class="line" style="top:450px"></div>
+
+    <div id="car"></div>
+    <div class="enemy" id="enemy"></div>
 </div>
 
 <script>
-    let bird = document.getElementById("bird");
-    let game = document.getElementById("game");
-    let scoreDisplay = document.getElementById("score");
+    let car = document.getElementById("car");
+    let enemy = document.getElementById("enemy");
+    let roadWidth = 250;
 
-    let birdTop = 200;
-    let gravity = 2;
-    let score = 0;
-
-    function jump() {
-        birdTop -= 40; // jump height
+    // Enemy start position
+    function resetEnemy() {
+        enemy.style.top = "-100px";
+        enemy.style.left = Math.floor(Math.random() * 250) + "px";
     }
 
-    document.body.onclick = jump; // Click to jump
+    resetEnemy();
 
-    function createPipes() {
-        let pipeTop = document.createElement("div");
-        let pipeBottom = document.createElement("div");
+    document.addEventListener("keydown", function (e) {
+        let carLeft = parseInt(window.getComputedStyle(car).getPropertyValue("left"));
 
-        let gap = 120; // gap between pipes
-        let topHeight = Math.floor(Math.random() * 250) + 50;
-        let bottomHeight = 500 - topHeight - gap;
+        if (e.key === "ArrowLeft" && carLeft > 0) {
+            car.style.left = (carLeft - 20) + "px";
+        }
+        else if (e.key === "ArrowRight" && carLeft < roadWidth) {
+            car.style.left = (carLeft + 20) + "px";
+        }
+    });
 
-        pipeTop.classList.add("pipe");
-        pipeBottom.classList.add("pipe");
+    // Collision check
+    setInterval(function () {
+        let carLeft = parseInt(window.getComputedStyle(car).getPropertyValue("left"));
+        let carTop = parseInt(window.getComputedStyle(car).getPropertyValue("top"));
 
-        pipeTop.style.height = topHeight + "px";
-        pipeBottom.style.height = bottomHeight + "px";
+        let enemyLeft = parseInt(window.getComputedStyle(enemy).getPropertyValue("left"));
+        let enemyTop = parseInt(window.getComputedStyle(enemy).getPropertyValue("top"));
 
-        pipeTop.style.top = "0px";
-        pipeBottom.style.bottom = "0px";
+        if (enemyTop > 450) resetEnemy();
 
-        pipeTop.style.right = "0px";
-        pipeBottom.style.right = "0px";
-
-        game.appendChild(pipeTop);
-        game.appendChild(pipeBottom);
-
-        let move = setInterval(() => {
-            let pipeLeft = parseInt(pipeTop.style.right);
-
-            if (pipeLeft > 400) {
-                clearInterval(move);
-                pipeTop.remove();
-                pipeBottom.remove();
-            }
-
-            pipeTop.style.right = pipeLeft + 2 + "px";
-            pipeBottom.style.right = pipeLeft + 2 + "px";
-
-            // collision detection
-            if (pipeLeft > 340 && pipeLeft < 400) {
-                if (birdTop < topHeight || birdTop + 30 > topHeight + gap) {
-                    alert("Game Over! Score: " + score);
-                    location.reload();
-                }
-            }
-
-            // score add
-            if (pipeLeft === 398) {
-                score++;
-                scoreDisplay.innerText = "Score: " + score;
-            }
-
-        }, 10);
-    }
-
-    setInterval(createPipes, 2000);
-
-    // Bird fall loop
-    setInterval(() => {
-        birdTop += gravity;
-        bird.style.top = birdTop + "px";
-
-        if (birdTop >= 470 || birdTop <= 0) {
-            alert("Game Over! Score: " + score);
+        // Collision logic
+        if (
+            enemyTop > 350 &&
+            enemyTop < 500 &&
+            Math.abs(carLeft - enemyLeft) < 50
+        ) {
+            alert("💥 Crash! Game Over!");
             location.reload();
         }
-    }, 20);
+    }, 10);
 </script>
 
 </body>
