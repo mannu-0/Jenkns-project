@@ -1,56 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Beautiful Card</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            font-family: Arial, sans-serif;
-        }
-        .card {
-            background: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            text-align: center;
-            width: 280px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: fadeIn 1.2s ease-in-out;
-        }
-        .card h2 {
-            margin: 0;
-            color: #333;
-        }
-        .card p {
-            color: #555;
-            margin: 10px 0 20px;
-        }
-        .btn {
-            padding: 10px 18px;
-            background: #2575fc;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Mini Click Game</title>
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #111;
+        color: white;
+        font-family: Arial;
+        flex-direction: column;
+    }
+
+    #circle {
+        width: 80px;
+        height: 80px;
+        background: #ff4d4d;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    #circle:hover {
+        transform: scale(1.2);
+        background: #ff1a1a;
+    }
+
+    #score {
+        margin-top: 20px;
+        font-size: 24px;
+    }
+</style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Hello 👋</h2>
-        <p>This is a simple & beautiful HTML card UI.</p>
-        <a href="#" class="btn">Click Me</a>
-    </div>
+<div id="circle"></div>
+<div id="score">Score: 0</div>
+
+<script>
+    let score = 0;
+
+    document.getElementById("circle").onclick = function () {
+        score++;
+        document.getElementById("score").innerText = "Score: " + score;
+
+        // Random move
+        this.style.marginTop = (Math.random() * 200) + "px";
+        this.style.marginLeft = (Math.random() * 200) + "px";
+    };
+</script>
 
 </body>
 </html>
